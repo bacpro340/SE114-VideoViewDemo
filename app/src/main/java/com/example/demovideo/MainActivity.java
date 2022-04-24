@@ -154,13 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void saveVideoToStorage(Uri _uriVideo) {
         String videoFileName = "video_" + System.currentTimeMillis() + ".mp4";
-        ContentValues valueVideos = new ContentValues();
-        valueVideos.put(MediaStore.Video.Media.DISPLAY_NAME, videoFileName);
-
-        Uri collection = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-        Uri uriSavedVideo = getContentResolver().insert(collection, valueVideos);
-
-
         try {
             new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/Download/Save").mkdirs();
             File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/Download/Save/" + videoFileName);
@@ -178,8 +171,7 @@ public class MainActivity extends AppCompatActivity {
             }
             out.close();
             in.close();
-            valueVideos.clear();
-            getContentResolver().update(uriSavedVideo, valueVideos, null, null);
+
             makeToast("Saved");
         } catch (Exception e) {
             makeToast("error: " + e.getMessage());
@@ -213,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
             out.close();
             in.close();
             pfd.close();
-            valueVideos.clear();
             getContentResolver().update(uriSavedVideo, valueVideos, null, null);
             makeToast("Saved");
         } catch (Exception e) {
