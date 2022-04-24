@@ -160,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
         Uri collection = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
         Uri uriSavedVideo = getContentResolver().insert(collection, valueVideos);
 
+        new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/Download/Save").mkdirs();
         try {
             File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/Download/Save/" + videoFileName);
             FileOutputStream out = new FileOutputStream(file);
