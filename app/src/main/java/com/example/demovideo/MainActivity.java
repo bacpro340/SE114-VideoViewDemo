@@ -1,5 +1,9 @@
 package com.example.demovideo;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,7 +37,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int REQUEST_CODE_READ_EXTERNAL_PERMISSION = 1;
+    private static final int REQUEST_CODE_PERMISSION = 1;
     private static final int REQUEST_CODE_SELECT_VIDEO = 2;
     private static final String KEY_CURRENT_POSITION = "current_position";
     private static final String KEY_CURRENT_URI = "current_uri";
@@ -43,11 +47,30 @@ public class MainActivity extends AppCompatActivity {
     private Uri uriVideo;
     private int position = -1;
 
+    ActivityResultLauncher<Intent> pickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    uriVideo=result.getData().getData();
+                    mVideoView.setVideoURI(uriVideo);
+                    mVideoView.start();
+                }
+            }
+    );
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        CheckPermissions();
+        Button btn_addRaw = findViewById(R.id.btn_addRaw);
+        Button btn_addURL = findViewById(R.id.btn_addURL);
+        Button btn_addStorage = findViewById(R.id.btn_addStorage);
+        Button btn_addGallery = findViewById(R.id.btn_addGallery);
+        Button btn_saveGallery = findViewById(R.id.btn_saveGallery);
+        Button btn_saveStorage = findViewById(R.id.btn_saveStorage);
         // Find your VideoView in your video main xml layout
         mVideoView = findViewById(R.id.videoView_main);
 
@@ -72,9 +95,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        CheckPermissions();
-
-        Button btn_addRaw = findViewById(R.id.btn_addRaw);
         btn_addRaw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button btn_addURL = findViewById(R.id.btn_addURL);
         btn_addURL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button btn_addStorage = findViewById(R.id.btn_addStorage);
         btn_addStorage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,26 +126,23 @@ public class MainActivity extends AppCompatActivity {
                     // Access to Storage
                     Intent selectVideoIntent = new Intent(Intent.ACTION_GET_CONTENT);
                     selectVideoIntent.setType("video/*");
-                    startActivityIfNeeded(selectVideoIntent, REQUEST_CODE_SELECT_VIDEO);
+                    pickerLauncher.launch(selectVideoIntent);
                 }
             }
         });
 
-        Button btn_addGallery = findViewById(R.id.btn_addGallery);
         btn_addGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (CheckPermissions()) {
                     // Access to Gallery
-                    Intent selectVideoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-                    //Intent selectVideoIntent = new Intent(Intent.ACTION_PICK);
-                    //selectVideoIntent.setType("video/*");
-                    startActivityIfNeeded(selectVideoIntent, REQUEST_CODE_SELECT_VIDEO);
+                    Intent selectVideoIntent = new Intent(Intent.ACTION_PICK);
+                    selectVideoIntent.setType("video/*");
+                    pickerLauncher.launch(selectVideoIntent);
                 }
             }
         });
 
-        Button btn_saveGallery = findViewById(R.id.btn_saveGallery);
         btn_saveGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button btn_saveStorage = findViewById(R.id.btn_saveStorage);
         btn_saveStorage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -189,8 +203,7 @@ public class MainActivity extends AppCompatActivity {
         Uri uriSavedVideo = getContentResolver().insert(collection, valueVideos);
 
         try {
-            ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(uriSavedVideo, "w");
-            FileOutputStream out = new FileOutputStream(pfd.getFileDescriptor());
+            OutputStream out = getContentResolver().openOutputStream(uriSavedVideo);
             // Get the already saved video as FileInputStream from here
             InputStream in = getContentResolver().openInputStream(_uriVideo);
 
@@ -204,7 +217,6 @@ public class MainActivity extends AppCompatActivity {
             }
             out.close();
             in.close();
-            pfd.close();
             getContentResolver().update(uriSavedVideo, valueVideos, null, null);
             makeToast("Saved");
         } catch (Exception e) {
@@ -243,25 +255,15 @@ public class MainActivity extends AppCompatActivity {
         mVideoView.start();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_SELECT_VIDEO && resultCode == RESULT_OK) {
-            uriVideo = data.getData();
-
-            mVideoView.setVideoURI(uriVideo);
-            mVideoView.start();
-        }
-    }
-
     public boolean CheckPermissions() {
         // Check whether user has granted read external storage permission to this activity.
-        int readExternalStoragePermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        int readExternalStoragePermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                + ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         // If not grant then require read external storage permission.
         if (readExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
-            String requirePermission[] = {Manifest.permission.READ_EXTERNAL_STORAGE};
-            ActivityCompat.requestPermissions(MainActivity.this, requirePermission, REQUEST_CODE_READ_EXTERNAL_PERMISSION);
+            String requirePermission[] = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            ActivityCompat.requestPermissions(MainActivity.this, requirePermission, REQUEST_CODE_PERMISSION);
             return false;
         } else {
             return true;
