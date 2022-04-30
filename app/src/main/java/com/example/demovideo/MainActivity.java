@@ -52,9 +52,12 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
-                    uriVideo=result.getData().getData();
-                    mVideoView.setVideoURI(uriVideo);
-                    mVideoView.start();
+                    if (result.getData()!=null){
+                        uriVideo=result.getData().getData();
+                        mVideoView.setVideoURI(uriVideo);
+                        mVideoView.start();
+                    }
+
                 }
             }
     );
