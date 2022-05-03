@@ -12,92 +12,52 @@
         android:stretchColumns="1">
 
         <!-- everything you already have -->
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
+
             <VideoView
                 android:id="@+id/videoView_main"
                 android:layout_width="wrap_content"
                 android:layout_height="300dp"
-                android:layout_gravity="center"
-                />
-        </LinearLayout>
+                android:layout_gravity="center" />
+        </FrameLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            >
-            <LinearLayout
-                android:layout_width="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <Button
+                android:id="@+id/btn_addRaw"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
+                android:backgroundTint="@color/black"
+                android:text="ADD RAW" />
 
-                android:layout_marginStart="40dp"
-                android:layout_marginTop="40dp"
-                >
-                <Button
-                    android:id="@+id/btn_addRaw"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="ADD RAW"
-                    android:backgroundTint="@color/black"
-                    />
-
-                <Button
-                    android:id="@+id/btn_addURL"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="ADD URL"
-                    android:backgroundTint="@color/black"
-                    />
-
-                <Button
-                    android:id="@+id/btn_addStorage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="ADD Storage"
-                    android:backgroundTint="@color/black"
-                    />
-
-                <Button
-                    android:id="@+id/btn_addGallery"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="ADD Gallery"
-                    android:backgroundTint="@color/black"
-                    />
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/btn_addURL"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginStart="40dp"
-                android:layout_marginTop="40dp"
-                >
+                android:backgroundTint="@color/black"
+                android:text="ADD URL" />
 
-                <Button
-                    android:id="@+id/btn_saveGallery"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="SAVE TO GALLERY" />
+            <Button
+                android:id="@+id/btn_addStorage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/black"
+                android:text="ADD Storage" />
 
-                <Button
-                    android:id="@+id/btn_saveStorage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="SAVE TO STORAGE" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/btn_addGallery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/black"
+                android:text="ADD Gallery" />
         </LinearLayout>
-
     </TableLayout>
-
-
-
 </ScrollView>
