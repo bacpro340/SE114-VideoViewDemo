@@ -38,7 +38,6 @@ import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISSION = 1;
-    private static final int REQUEST_CODE_SELECT_VIDEO = 2;
     private static final String KEY_CURRENT_POSITION = "current_position";
     private static final String KEY_CURRENT_URI = "current_uri";
 
@@ -47,17 +46,16 @@ public class MainActivity extends AppCompatActivity {
     private Uri uriVideo;
     private int position = -1;
 
-    ActivityResultLauncher<Intent> pickerLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
+    ActivityResultLauncher<String> pickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
                 @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getData()!=null){
-                        uriVideo=result.getData().getData();
+                public void onActivityResult(Uri result) {
+                    if (result!=null){
+                        uriVideo=result;
                         mVideoView.setVideoURI(uriVideo);
                         mVideoView.start();
                     }
-
                 }
             }
     );
@@ -127,9 +125,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (CheckPermissions()) {
                     // Access to Storage
-                    Intent selectVideoIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                    selectVideoIntent.setType("video/*");
-                    pickerLauncher.launch(selectVideoIntent);
+                    String videoPath = Environment.getExternalStorageDirectory() +"/Download/video_sample_1.mp4";
+                    uriVideo = Uri.parse(videoPath);
+                    if (uriVideo!=null){
+                        // set the path for the video view
+                        mVideoView.setVideoURI(uriVideo);
+                        // start a video
+                        mVideoView.start();
+                    }
                 }
             }
         });
@@ -139,9 +142,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (CheckPermissions()) {
                     // Access to Gallery
-                    Intent selectVideoIntent = new Intent(Intent.ACTION_PICK);
-                    selectVideoIntent.setType("video/*");
-                    pickerLauncher.launch(selectVideoIntent);
+                    pickerLauncher.launch("video/*");
                 }
             }
         });
